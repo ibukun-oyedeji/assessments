@@ -1,0 +1,32 @@
+name: Deploy Task Tracker to GCP VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  update_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Update Docker containers on GCP VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GCP_VM_HOST }}
+          username: ubuntu
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -x
+            cd ~/task-tracker || { echo "Directory ~/task-tracker not found!"; exit 1; }
+            if [ ! -d .git ]; then
+              echo "Error: Not a git repository!"
+              exit 1
+            fi
+            git pull origin main
+            docker compose down
+            docker compose up -d --build
