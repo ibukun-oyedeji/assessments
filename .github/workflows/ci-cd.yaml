@@ -17,7 +17,7 @@ jobs:
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.GCP_VM_HOST }}
-          username: ubuntu
+          username: ibukun_o
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           port: 22
           script: |
