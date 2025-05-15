@@ -22,7 +22,7 @@ jobs:
           port: 22
           script: |
             set -x
-            cd ~/task-tracker || { echo "Directory ~/task-tracker not found!"; exit 1; }
+            cd ~/assessments || { echo "Directory ~/task-tracker not found!"; exit 1; }
             if [ ! -d .git ]; then
               echo "Error: Not a git repository!"
               exit 1
