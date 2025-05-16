@@ -15,9 +15,11 @@ services:
   prometheus:
     image: prom/prometheus:latest
     volumes:
-      - ./prometheus.yml:/etc/prometheus/prometheus.yml # Without :ro, making it read-write
+      - ./prometheus.yml:/prometheus.yml:ro
     ports:
       - "9090:9090"
+    command:
+      - "--config.file=/prometheus.yml"
 
   grafana:
     image: grafana/grafana:latest
