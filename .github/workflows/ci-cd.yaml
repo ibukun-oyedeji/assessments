@@ -23,28 +23,86 @@ jobs:
           port: 22
           script: |
             set -x
+
+            # Clone the repository into prod or staging directory depending on branch
             if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              # For prod branch
               cd /home/ibukun_o/assessments/prod || { echo "Directory /home/ibukun_o/assessments/prod not found!"; exit 1; }
             elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+              # For staging branch
               cd /home/ibukun_o/assessments/staging || { echo "Directory /home/ibukun_o/assessments/staging not found!"; exit 1; }
             else
               echo "Branch not deployable, skipping deployment."
               exit 0
             fi
 
+            # Clone the repository if it's not already cloned
             if [ ! -d .git ]; then
-              echo "Error: Not a git repository!"
-              exit 1
+              echo "Cloning the repository into the environment directory"
+              git clone https://github.com/ibukun-oyedeji/assessments.git .
             fi
 
+            # Pull latest changes for the specific branch
             git pull origin ${{ github.ref_name }}
 
-            # Stopping all services
+            # Rebuild and restart the containers
             sudo docker compose down
-
-            # Rebuilding and starting all services including Prometheus and Grafana
             sudo docker compose up -d --build
 
-            #restart Prometheus and Grafana 
+            # Optionally restart Prometheus and Grafana if you need to force them
+            sudo docker restart prometheus
+            sudo docker restart grafana
+name: Deploy Task Tracker to VM
+
+on:
+  push:
+    branches:
+      - main
+      - staging
+
+jobs:
+  update_code:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Update Docker containers on GCP VM
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.GCP_VM_HOST }}
+          username: ibukun_o
+          key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            set -x
+
+            # Clone the repository into prod or staging directory depending on branch
+            if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
+              # For prod branch
+              cd /home/ibukun_o/assessments/prod || { echo "Directory /home/ibukun_o/assessments/prod not found!"; exit 1; }
+            elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
+              # For staging branch
+              cd /home/ibukun_o/assessments/staging || { echo "Directory /home/ibukun_o/assessments/staging not found!"; exit 1; }
+            else
+              echo "Branch not deployable, skipping deployment."
+              exit 0
+            fi
+
+            # Clone the repository if it's not already cloned
+            if [ ! -d .git ]; then
+              echo "Cloning the repository into the environment directory"
+              git clone https://github.com/ibukun-oyedeji/assessments.git .
+            fi
+
+            # Pull latest changes for the specific branch
+            git pull origin ${{ github.ref_name }}
+
+            # Rebuild and restart the containers
+            sudo docker compose down
+            sudo docker compose up -d --build
+
+            # Optionally restart Prometheus and Grafana if you need to force them
             sudo docker restart prometheus
             sudo docker restart grafana
