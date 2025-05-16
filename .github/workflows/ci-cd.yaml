@@ -36,7 +36,7 @@ jobs:
               exit 0
             fi
 
-            # Clone the repository if it's not already cloned
+            # Clone the repository 
             if [ ! -d .git ]; then
               echo "Cloning the repository into the environment directory"
               git clone https://github.com/ibukun-oyedeji/assessments.git .
@@ -48,7 +48,3 @@ jobs:
             # Rebuild and restart the containers
             sudo docker compose down
             sudo docker compose up -d --build
-
-            # Optionally restart Prometheus and Grafana if you need to force them
-            sudo docker restart prometheus
-            sudo docker restart grafana
