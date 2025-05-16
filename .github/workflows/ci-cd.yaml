@@ -24,9 +24,9 @@ jobs:
           script: |
             set -x
             if [[ "${{ github.ref }}" == "refs/heads/main" ]]; then
-              cd ~/assessments-prod || { echo "Directory ~/assessments-prod not found!"; exit 1; }
+              cd /home/ibukun_o/assessments/prod || { echo "Directory /home/ibukun_o/assessments/prod not found!"; exit 1; }
             elif [[ "${{ github.ref }}" == "refs/heads/staging" ]]; then
-              cd ~/assessments-staging || { echo "Directory ~/assessments-staging not found!"; exit 1; }
+              cd /home/ibukun_o/assessments/staging || { echo "Directory /home/ibukun_o/assessments/staging not found!"; exit 1; }
             else
               echo "Branch not deployable, skipping deployment."
               exit 0
@@ -45,6 +45,6 @@ jobs:
             # Rebuilding and starting all services including Prometheus and Grafana
             sudo docker compose up -d --build
 
-            # Optional: restart Prometheus and Grafana (if you need to force them)
+            #restart Prometheus and Grafana 
             sudo docker restart prometheus
             sudo docker restart grafana
